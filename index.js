@@ -14,25 +14,37 @@ module.exports.parse = function (buf) {
 
 function parseHeader(buf, offset) {
     var index = buf.readUInt32LE(offset + 0);
-    var offset1 = buf.readUInt32LE(offset + 8) + offset + 8 + 4;
-    var offset2 = buf.readUInt32LE(offset + 20) + offset + 20 + 4;
-    var type = buf.readUInt32LE(offset + 12);
+    var offsetIdentifier = buf.readUInt32LE(offset + 8) + offset + 8 + 4;
+    var offsetFramePointer = buf.readUInt32LE(offset + 20) + offset + 20 + 4;
+    var frameCount = buf.readUInt32LE(offset + 12);
 
-    var str = buf.toString('ascii', offset2, offset2 + 13);
+    var str = buf.toString('ascii', offsetFramePointer, offsetFramePointer + 13);
     if (str != 'SheetSequence') return false;
 
-    if (type == 1) { //Single frame
-        var coords = [[], []];
-
-        for (var i = 0; i < 8; i++) {
-            var c = (i < 4) ? 0:1;
-            coords[c].push(buf.readFloatLE(offset1 + 8 + i * 4));
-        }
+    var frames = [];
 
 
-        return {index, type: 'single', str, frames: [coords]};
+    for (var i = 0; i < frameCount; i ++) {
+        var offsetCoords = buf.readUInt32LE(offsetIdentifier) + offsetIdentifier;
+
+        frames.push(getCoords(buf, offsetCoords));
+        offsetIdentifier += 12;
     }
 
-    console.log('Unknown slice format', type);
-    return null;
+
+
+    return {index, frameCount, str, frames};
+
+}
+
+function getCoords(buf, offset) {
+    var coords = [[], []];
+
+    for (var i = 0; i < 8; i++) {
+        var c = (i < 4) ? 0:1;
+        coords[c].push(buf.readFloatLE(offset + i * 4, true));
+    }
+
+
+    return coords;
 }
