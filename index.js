@@ -33,5 +33,6 @@ function parseHeader(buf, offset) {
         return {index, type: 'single', str, frames: [coords]};
     }
 
+    console.log('Unknown slice format', type);
     return null;
 }
