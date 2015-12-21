@@ -18,5 +18,8 @@
   "bugs": {
     "url": "https://github.com/loveolsson/TextureSheetParser/issues"
   },
-  "homepage": "https://github.com/loveolsson/TextureSheetParser#readme"
+  "homepage": "https://github.com/loveolsson/TextureSheetParser#readme",
+  "dependencies": {
+    "easyimage": "^2.1.0"
+  }
 }
